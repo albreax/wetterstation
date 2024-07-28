@@ -10,20 +10,20 @@
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 3600, 60000);
 
-// Definieren Sie hier Ihre e-Paper Display Variante
+// define the display
 GxEPD2_BW<GxEPD2_420_GDEY042T81, GxEPD2_420_GDEY042T81::HEIGHT> display(GxEPD2_420_GDEY042T81(/*CS=*/ 10, /*DC=*/ 9, /*RST=*/ 8, /*BUSY=*/ 7));
 
 void setup() {
-  // Initialisieren Sie die serielle Kommunikation (optional)
+  // initialize serial communication
   Serial.begin(115200);
   
-  // Setzen Sie die SPI-Pins für den ESP32
+  // set up the SPI bus
   SPI.begin(/*SCK=*/ 13, /*MISO=*/ -1, /*MOSI=*/ 11, /*SS=*/ 10);
 
-  // Initialisieren Sie das Display
+  // initialize the display
   display.init(115200);
 
-  // Verbinden Sie sich mit dem WLAN
+  // setup WiFi
   display.nextPage();
   display.fillScreen(GxEPD_WHITE);
   display.setCursor(0, 0);
@@ -41,34 +41,18 @@ void setup() {
   Serial.println("Connected to WiFi");
   display.println("Connected to WiFi");
   display.display();
-  // NTP-Client initialisieren
+  // NTP-Client initialise
   timeClient.begin();
 }
 
-// Funktion zur Erkennung der Sommerzeit in Europa
-bool isSummerTimeEurope(struct tm &time) {
-  // Letzter Sonntag im März, 1:00 UTC
-  if (time.tm_mon > 2 && time.tm_mon < 9) return true; // April bis September ist Sommerzeit
-  if (time.tm_mon < 2 || time.tm_mon > 9) return false; // Januar, Februar, November, Dezember ist keine Sommerzeit
-  
-  int lastSunday = time.tm_mday - (time.tm_wday ? time.tm_wday : 7);
-  if (time.tm_mon == 2) return (time.tm_hour >= 1) && (time.tm_mday > lastSunday); // März
-  return (time.tm_hour < 1) && (time.tm_mday < lastSunday); // Oktober
-}
-
 void loop() {
-  // Aktualisieren Sie die Zeit vom NTP-Server
+  // fetch the time from the NTP-Server
   timeClient.update();
 
-  // Holen Sie sich das aktuelle Datum und die Uhrzeit
   unsigned long epochTime = timeClient.getEpochTime();
   struct tm *ptm = gmtime((time_t *)&epochTime); 
 
-  // Sommerzeit berücksichtigen
-  if (isSummerTimeEurope(*ptm)) {
-    epochTime += 3600; // Eine Stunde hinzufügen
-    ptm = gmtime((time_t *)&epochTime);
-  }
+  ptm->tm_hour = (ptm->tm_hour + hourOffset) % 24;
 
   int day = ptm->tm_mday;
   int month = ptm->tm_mon + 1;
@@ -76,14 +60,14 @@ void loop() {
   int hour = ptm->tm_hour;
   int minute = ptm->tm_min;
 
-  // Datum und Uhrzeit formatieren
+  // format the date and time
   char dateBuffer[16];
   snprintf(dateBuffer, sizeof(dateBuffer), "%02d.%02d.%04d", day, month, year);
 
   char timeBuffer[16];
   snprintf(timeBuffer, sizeof(timeBuffer), "%02d:%02d", hour, minute);
 
-  // Aktualisieren Sie das Display
+  // update the display
   display.setPartialWindow(0, 0, display.width(), display.height());
   display.firstPage();
 
@@ -95,7 +79,6 @@ void loop() {
     display.println(String(dateBuffer) + "              " + String(timeBuffer) + " Uhr");
   } while (display.nextPage());
 
-  // Warten Sie eine Sekunde vor der nächsten Aktualisierung
   delay(1000);
 }
 
