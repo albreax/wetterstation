@@ -16,7 +16,7 @@ GxEPD2_BW<GxEPD2_420_GDEY042T81, GxEPD2_420_GDEY042T81::HEIGHT> display(GxEPD2_4
 void setup() {
   // Initialisieren Sie die serielle Kommunikation (optional)
   Serial.begin(115200);
-  while (!Serial);
+  
   // Setzen Sie die SPI-Pins für den ESP32
   SPI.begin(/*SCK=*/ 13, /*MISO=*/ -1, /*MOSI=*/ 11, /*SS=*/ 10);
 
