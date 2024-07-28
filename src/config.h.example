@@ -5,7 +5,9 @@
 const char* ssid     = "YOUR_SSID";
 const char* password = "YOUR_PASSWORD";
 
-// NTP-Server
-int hourOffset = 1; // MEZ Offset
+// data/time pool Server
+const char* poolServerName = "pool.ntp.org"; // default
+// const char* poolServerName = "europe.pool.ntp.org";
+const int hourOffset = 1; // MEZ Offset
 
 #endif
