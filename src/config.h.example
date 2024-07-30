@@ -10,4 +10,14 @@ const char* poolServerName = "pool.ntp.org"; // default
 // const char* poolServerName = "europe.pool.ntp.org";
 const int hourOffset = 1; // MEZ Offset
 
+// WiFi credentials
+#define WIFI_SSID       "YOUR_SSID"
+#define WIFI_PASSWORD   "YOUR_PASSWORD"
+
+// MQTT-Server 
+#define MQTT_HOST       "MQTT-Broker"
+#define MQTT_PORT       1883
+#define MQTT_ID         "wetterstation"
+#define MQTT_TOPIC      "thermometer/outdoor"
+
 #endif
