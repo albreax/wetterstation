@@ -21,6 +21,7 @@ GxEPD2_BW<GxEPD2_420_GDEY042T81, GxEPD2_420_GDEY042T81::HEIGHT> display(GxEPD2_4
 String temperature = "N/A";
 
 void connectToWiFi() {
+  display.clearScreen();
   display.print("Connecting to WiFi...");
   display.display();
   
@@ -108,7 +109,8 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
   // Hier können Sie die Nachrichtenverarbeitung hinzufügen
   if (strcmp(topic, MQTT_TOPIC) == 0) {
     // tempertur = "Außentemperatur: " + (char *)payload;
-    temperature = (char *)payload;
+    float temp = atof((char *)payload);
+    temperature = String(temp, 1);
   }
 }
 
