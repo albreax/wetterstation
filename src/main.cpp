@@ -19,6 +19,8 @@ PubSubClient client(espClient);
 GxEPD2_BW<GxEPD2_420_GDEY042T81, GxEPD2_420_GDEY042T81::HEIGHT> display(GxEPD2_420_GDEY042T81(/*CS=*/ 10, /*DC=*/ 9, /*RST=*/ 8, /*BUSY=*/ 7));
 
 String temperature = "N/A";
+// Array mit deutschen Wochentagen
+const char* weekDays[7] = {"Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"};
 
 void connectToWiFi() {
   display.clearScreen();
@@ -84,6 +86,8 @@ void displayContent() {
 
   char timeBuffer[16];
   snprintf(timeBuffer, sizeof(timeBuffer), "%02d:%02d", hour, minute);
+  
+  const char* weekDay = weekDays[ptm->tm_wday];
 
   // Update the display
   display.setPartialWindow(0, 0, display.width(), display.height());
@@ -91,10 +95,12 @@ void displayContent() {
   do {
     display.fillScreen(GxEPD_WHITE);
     display.setCursor(0, 0);
-    display.setTextSize(2);
+    
     display.setTextColor(GxEPD_BLACK);
-    display.println(String(dateBuffer) + "              " + String(timeBuffer) + " Uhr");
-    display.println("Außentemperatur: " + temperature + "°C");
+    display.println(String(weekDay) + " " +  String(dateBuffer));
+    display.println(String(timeBuffer) + " Uhr");
+    // FIXME: display.println("Außentemperatur: " + temperature + "°C");
+    display.println("Aussentemperatur: " + temperature + "C");
   } while (display.nextPage());
 }
 
@@ -123,6 +129,9 @@ void setup() {
 
   // Initialize the display
   display.init(115200);
+
+  // display.setFont(&FreeSerifItalic9pt7b);
+  display.setTextSize(1);
 
   // Setup WiFi
   display.nextPage();
